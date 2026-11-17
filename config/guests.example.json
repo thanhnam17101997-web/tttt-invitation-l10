@@ -1,0 +1,14 @@
+[
+  {
+    "id": "demo-linh",
+    "displayName": "Linh",
+    "personalMessage": "Có một điều thú vị đang chờ bạn!",
+    "theme": "pink"
+  },
+  {
+    "id": "demo-minh-anh",
+    "displayName": "Minh Anh",
+    "personalMessage": "Hẹn gặp bạn nhé!",
+    "theme": "mint"
+  }
+]

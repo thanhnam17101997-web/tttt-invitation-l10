@@ -1,0 +1,1091 @@
+/* Loaded locally for the WebGL hero masks only. UI keeps Be Vietnam Pro. */
+@font-face {
+  font-family: 'DynaPuff Hero';
+  src: url('/assets/fonts/DynaPuff-700.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --bg-deep-plum: #130524;
+  --bg-rich-purple: #1f0b3b;
+  --color-pink-glow: rgba(255, 52, 109, 0.25);
+  --color-gold-glow: rgba(255, 193, 90, 0.2);
+  --text-primary: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-deep-plum);
+  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text-primary);
+  user-select: none;
+  -webkit-user-select: none;
+  overscroll-behavior: none;
+}
+
+#app {
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 25%, #2a1150 0%, #150729 60%, #0c0317 100%);
+  overflow: hidden;
+}
+
+/* 9:16 Editorial mobile stage */
+.stage-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 440px;
+  max-height: 880px;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 28%, #253879 0%, #11194d 52%, #070b2c 100%);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* L10 authored environment: static translucent folds, deliberately behind
+   the physics canvas. These are CSS-only to keep the live stage light. */
+.stage-ribbons { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+.stage-ribbons i { position:absolute; display:block; width:82%; height:18%; border:1px solid rgba(202,168,255,.28); border-radius:50%; filter:blur(.2px); box-shadow:inset 0 2px 14px rgba(255,218,253,.16),0 0 30px rgba(115,101,255,.23); opacity:.85; }
+.stage-ribbons i::after { content:''; position:absolute; inset:7px; border-radius:inherit; border-top:3px solid rgba(255,175,232,.46); border-left:2px solid rgba(137,192,255,.35); filter:blur(2px); }
+.stage-ribbons i:nth-child(1){left:-46%;top:2%;transform:rotate(-29deg)}
+.stage-ribbons i:nth-child(2){right:-53%;top:15%;transform:rotate(31deg);width:90%;height:22%}
+.stage-ribbons i:nth-child(3){left:-38%;bottom:4%;transform:rotate(21deg);width:90%;height:20%}
+.stage-ribbons i:nth-child(4){right:-42%;bottom:9%;transform:rotate(-25deg);width:98%;height:19%}
+.stage-ribbons b { position:absolute; display:block; width:56%; height:20%; border-radius:50%; background:radial-gradient(ellipse,rgba(129,105,255,.28),rgba(70,61,180,.10) 46%,transparent 72%); filter:blur(15px); }
+.stage-ribbons b:nth-of-type(1){top:28%;left:-18%;transform:rotate(-22deg)}
+.stage-ribbons b:nth-of-type(2){top:45%;right:-25%;transform:rotate(20deg)}
+.stage-ribbons b:nth-of-type(3){bottom:-2%;left:22%;transform:rotate(-7deg)}
+
+@media (max-width: 600px) {
+  .stage-container {
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: unset;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+@media (min-width: 601px) {
+  .stage-container {
+    border-radius: 36px;
+  }
+}
+
+/* Spatial lighting glows */
+.stage-bg-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(60px);
+  z-index: 0;
+}
+
+.stage-bg-glow-top {
+  width: 240px;
+  height: 240px;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(205, 162, 255, 0.26) 0%, rgba(255, 120, 180, 0) 70%);
+}
+
+.stage-bg-glow-center {
+  width: 320px;
+  height: 320px;
+  top: 36%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(160, 60, 255, 0.16) 0%, rgba(160, 60, 255, 0) 70%);
+}
+
+/* Canvas */
+#mochiCanvas,
+#stageCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#mochiCanvas {
+  z-index: 1;
+  pointer-events: none;
+}
+
+#stageCanvas {
+  z-index: 2;
+}
+
+/* Header */
+.stage-header {
+  position: absolute;
+  top: env(safe-area-inset-top, 16px);
+  left: 0;
+  width: 100%;
+  padding-top: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.brand-logo {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
+}
+
+/* UI Overlay */
+.stage-ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 16px) + 78px) 24px calc(env(safe-area-inset-bottom, 16px) + 20px);
+  z-index: 10;
+}
+
+/* Touch prompt */
+.touch-hint {
+  display: flex;
+  justify-content: flex-start;
+  align-self: flex-start;
+  margin-top: 10px;
+  margin-left: 8px;
+  opacity: 0.94;
+  animation: floatHint 4s ease-in-out infinite alternate;
+  transition: opacity 0.4s ease;
+}
+
+@keyframes floatHint {
+  0% {
+    transform: translateY(0px) rotate(-1.5deg);
+  }
+
+  100% {
+    transform: translateY(-6px) rotate(1.5deg);
+  }
+}
+
+.cloud-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(245,224,255,.86));
+  color: #302052;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  border-radius: 999px;
+  box-shadow: inset 1px 2px 5px rgba(255,255,255,.9), 0 10px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.cloud-pill::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 24px;
+  width: 12px;
+  height: 12px;
+  background: #f9edff;
+  border-radius: 50%;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Actions Container */
+.stage-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+/* CTA: MỞ LỜI MỜI (Yellow Puffy Gummy Button) */
+.cta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  animation: popInCTA 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popInCTA {
+  0% {
+    transform: scale(0.7) translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.btn-open-invite {
+  width: 100%;
+  max-width: 290px;
+  height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #3e214f;
+  background: linear-gradient(180deg, #ffe9fb 0%, #f8a8d7 48%, #d564ad 100%);
+  border: none;
+  border-radius: 26px;
+  cursor: pointer;
+  outline: none;
+  border-top: 2.5px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 12px 28px rgba(255, 126, 205, 0.42),
+    0 5px 0 #99477f,
+    inset 0 2px 8px rgba(255, 255, 255, 0.7);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-open-invite::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 18px;
+  right: 18px;
+  height: 38%;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.btn-open-invite:active {
+  transform: scale(0.95) translateY(2px);
+  box-shadow: 0 6px 16px rgba(255, 170, 20, 0.4), 0 2px 0 #b35900;
+}
+
+.btn-envelope-icon {
+  font-size: 20px;
+}
+
+.sub-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.btn-sub {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s;
+}
+
+.btn-sub:hover {
+  color: #ffffff;
+}
+
+/* Bottom Shortcut Pill */
+.shortcut-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.shortcut-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  background: linear-gradient(135deg, rgba(250,231,255,.25), rgba(184,162,255,.14));
+  border: 1px solid rgba(252,230,255,.4);
+  padding: 11px 22px;
+  border-radius: 999px;
+  cursor: pointer;
+  outline: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+}
+
+.shortcut-pill:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.shortcut-pill:active {
+  transform: scale(0.95);
+}
+
+.shortcut-arrow {
+  opacity: 0.8;
+  transition: transform 0.2s ease;
+}
+
+.shortcut-pill:hover .shortcut-arrow {
+  transform: translateX(3px);
+}
+
+/* =========================================================
+   INVITATION POPUP MODAL (Organic SVG Background Card Integration)
+   ========================================================= */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(7, 10, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Organic Card Container — Preserves 800:1300 Aspect Ratio */
+.modal-card {
+  position: relative;
+  width: min(88vw, calc((85dvh - 32px) * 0.615), 360px);
+  aspect-ratio: 800 / 1300;
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0 auto;
+  filter: drop-shadow(0 26px 48px rgba(3, 4, 28, .48));
+  transform: translateY(24px) scale(0.94);
+  transition: transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+  outline: none;
+}
+
+.modal-overlay.visible .modal-card {
+  transform: translateY(0) scale(1);
+}
+
+/* Organic Background Asset Layer */
+.modal-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-card-bg .card-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Modal Close Button (Floating Pill Purple Jelly at Top-Right Shoulder) */
+.modal-close-btn {
+  position: absolute;
+  top: 1.5%;
+  right: 2%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(145deg,#fff7ff 5%,#f3a3d7 54%,#ca63ae 100%);
+  color:#603263;
+  color: #ffffff;
+  border: 2.5px solid #ffffff;
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,.9),0 5px 14px rgba(117,42,103,.42);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  background: #ab47bc;
+  transform: scale(1.08);
+}
+
+.modal-close-btn:active {
+  transform: scale(0.92);
+}
+
+/* Scrollable Interior HTML Content Layer */
+.modal-card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  /* 12-14% interior horizontal padding to nestle content neatly within scalloped artwork */
+  padding: 10% 14% 9%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  color: #260a3d;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244, 158, 198, 0.4) transparent;
+}
+
+.modal-card-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.modal-card-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-card-content::-webkit-scrollbar-thumb {
+  background: rgba(244, 158, 198, 0.45);
+  border-radius: 4px;
+}
+
+/* Card Header Content */
+.card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.card-salutation {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e0246a;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+
+.card-logo-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2px 0 6px;
+}
+
+.card-logo {
+  height: 44px;
+  max-width: 210px;
+  width: auto;
+  object-fit: contain;
+  /* Invert white SVG/PNG logo into deep rich plum purple (#260a3d) matching the approved comp */
+  filter: brightness(0) saturate(100%) invert(10%) sepia(55%) saturate(3500%) hue-rotate(255deg) brightness(85%) contrast(110%);
+}
+
+.guest-personal-msg {
+  font-size: 13px;
+  font-weight: 700;
+  font-style: italic;
+  color: #c2185b;
+  margin-bottom: 4px;
+  padding: 0 4px;
+}
+
+.card-description {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #4a2266;
+  line-height: 1.45;
+  max-width: 260px;
+}
+
+/* Dotted Divider Lines */
+.card-divider {
+  width: 90%;
+  border-top: 1.5px dashed rgba(220, 150, 180, 0.5);
+  margin: 6px 0;
+  flex-shrink: 0;
+}
+
+/* Event Details (Date, Time, Venue) */
+.event-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  padding: 2px 4px;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.detail-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: #fce8f0;
+  color: #d81b60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detail-text {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #290b43;
+  line-height: 1.35;
+}
+
+/* Social links row */
+.social-links-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+  padding-bottom: 2px;
+}
+
+.social-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  text-decoration: none;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.22);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
+}
+
+.social-pill:hover {
+  transform: translateY(-2px) scale(1.08);
+}
+
+.social-pill:active {
+  transform: scale(0.92);
+}
+
+.social-fb {
+  background: #1877f2;
+}
+
+.social-ig {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+}
+
+.social-web {
+  background: #6c5ce7;
+}
+
+/* ============================================
+   TTTT CARD FIX 01A — Manual layout correction
+   Paste at the very END of src/style.css
+   ============================================ */
+
+.modal-card {
+  width: min(92vw, calc(88dvh * 800 / 1300), 390px);
+  max-height: 88dvh;
+  aspect-ratio: 800 / 1300;
+  flex-shrink: 0;
+}
+
+/* Keep the organic SVG, but stop stretching
+   sparse content across the full card height. */
+.modal-card-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  width: 100%;
+  padding: 14% 13% 13%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.6dvh, 15px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: center;
+  min-height: 0;
+}
+
+.card-header {
+  width: 100%;
+  flex: 0 0 auto;
+  gap: 8px;
+  margin: 0;
+}
+
+.card-salutation {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  line-height: 1.5;
+  color: #9d477a;
+  margin: 0;
+}
+
+.card-logo-wrap {
+  width: 100%;
+  margin: 4px 0;
+}
+
+.card-logo {
+  width: min(100%, 245px);
+  height: auto;
+  max-width: 245px;
+  max-height: 92px;
+  object-fit: contain;
+}
+
+.guest-personal-msg {
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: #a53b74;
+  margin: 0;
+}
+
+.card-description {
+  font-size: 13px;
+  line-height: 1.65;
+  font-weight: 400;
+  max-width: 260px;
+  color: #58334f;
+}
+
+.card-divider {
+  width: 64%;
+  border-top: 1px solid rgba(161, 90, 133, 0.25);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* Do not show separators around missing sections. */
+.modal-card-content:has(#modalDetailsContainer[style*="display: none"]) #modalDividerTop {
+  display: none;
+}
+
+.modal-card-content:has(#modalSocialContainer[style*="display: none"]) #modalDividerBottom {
+  display: none;
+}
+
+.event-details-list {
+  width: 100%;
+  flex: 0 0 auto;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.detail-row {
+  gap: 10px;
+  align-items: center;
+}
+
+.detail-icon {
+  width: 28px;
+  height: 28px;
+  background: rgba(204, 122, 161, 0.12);
+  color: #a34c80;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.detail-text {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* Quiet editorial-style social actions */
+.social-links-row {
+  width: 100%;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 2px 0;
+}
+
+.social-links-line {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  min-height: 38px;
+}
+
+.social-pill {
+  width: 38px;
+  height: 38px;
+  background: #f5deea;
+  color: #71315e;
+  border: 1px solid rgba(148, 67, 113, 0.18);
+  box-shadow: none;
+}
+
+.social-fb,
+.social-ig,
+.social-web,
+.social-tiktok,
+.social-maps {
+  background: #f5deea;
+}
+
+.social-pill:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.98);
+}
+
+/* Small, restrained close button */
+.modal-close-btn {
+  top: 3%;
+  right: 5%;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(102, 53, 91, 0.20);
+  border-radius: 50%;
+  color: #713c66;
+  background: rgba(255, 244, 238, 0.92);
+  box-shadow: 0 3px 12px rgba(75, 20, 58, 0.10);
+}
+
+.modal-close-btn:hover {
+  background: #fff6f1;
+}
+
+@media (max-height: 680px) {
+  .modal-card-content {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .card-header {
+    gap: 5px;
+  }
+
+  .card-logo {
+    max-height: 66px;
+  }
+
+  .card-description {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+}
+
+/* TTTT CARD FIX 01B — Visual balance */
+
+.modal-card-content {
+  gap: clamp(6px, 1.1dvh, 11px);
+}
+
+.card-header {
+  gap: 4px;
+}
+
+.card-logo-wrap {
+  margin: 0;
+}
+
+.card-logo {
+  max-width: 270px;
+  max-height: 112px;
+}
+
+.card-salutation {
+  font-size: 11px;
+}
+
+.guest-personal-msg {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.card-description {
+  line-height: 1.55;
+}
+
+.modal-close-btn {
+  top: 4%;
+  right: 12%;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 246, 239, 0.95);
+  border: 1px solid rgba(110, 55, 94, 0.25);
+  box-shadow: none;
+}
+
+@media (max-height: 680px) {
+  .card-logo {
+    max-height: 76px;
+  }
+}
+
+/* ==============================================
+   TTTT PATCH 03 — Stage layout + reveal CTA
+   ============================================== */
+
+/* Stage UI no longer distributes children vertically */
+.stage-ui {
+  justify-content: flex-start;
+}
+
+/* Hint stays near the top, independently of CTA */
+.touch-hint {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 108px);
+  left: 28px;
+  margin: 0;
+  z-index: 2;
+}
+
+/* Both shortcut and final CTA occupy the same bottom area */
+.stage-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  width: 100%;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  z-index: 20;
+}
+
+.cta-container,
+.shortcut-container {
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove game-like yellow button treatment */
+.btn-open-invite {
+  width: auto;
+  min-width: 174px;
+  max-width: 260px;
+  height: 51px;
+  padding: 0 28px;
+
+  color: #672650;
+  background: linear-gradient(180deg,
+      #fff2e8 0%,
+      #f9cadb 100%);
+
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+
+  box-shadow:
+    0 10px 28px rgba(11, 2, 27, 0.28),
+    inset 0 2px 6px rgba(255, 255, 255, 0.55);
+
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.btn-open-invite::after {
+  display: none;
+}
+
+.btn-open-invite:active {
+  transform: scale(0.96);
+  box-shadow: 0 5px 14px rgba(11, 2, 27, 0.3);
+}
+
+/* Hide envelope emoji */
+.btn-envelope-icon {
+  display: none;
+}
+
+/* Remove game controls */
+.sub-actions {
+  display: none !important;
+}
+
+/* Understated shortcut during exploration */
+.shortcut-pill {
+  font-size: 13px;
+  padding: 10px 19px;
+  background: rgba(255, 240, 246, 0.12);
+  border: 1px solid rgba(255, 240, 246, 0.25);
+  box-shadow: 0 6px 20px rgba(9, 2, 22, 0.2);
+}
+
+@media (max-height: 650px) {
+  .touch-hint {
+    top: calc(env(safe-area-inset-top, 0px) + 90px);
+  }
+
+  .stage-actions {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 14px);
+  }
+}
+
+/* TTTT — PATCH 03: STAGE CTA & CONTROLS */
+
+#stageUi {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#stageUi .stage-actions {
+  position: absolute;
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  transform: none;
+  width: 100%;
+  padding: 0 20px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 30;
+}
+
+/* L10 final composition: substantial luminous ribbon volumes, never hit-test
+   the scene, with only transform animation on the compositor. */
+.stage-ribbons { background:radial-gradient(ellipse at 48% 39%,rgba(104,100,225,.22),transparent 43%),linear-gradient(160deg,#101a56 0%,#162668 45%,#090e35 100%); }
+.stage-ribbons i { width:112%; height:24%; border:0; opacity:.88; filter:blur(1px); box-shadow:none; background:linear-gradient(180deg,rgba(145,126,255,.36),rgba(102,69,211,.10) 38%,rgba(20,29,106,0) 74%); border-radius:48% 52% 50% 50%; transform-origin:center; animation:ribbon-drift 15s ease-in-out infinite alternate; }
+.stage-ribbons i::after { inset:8% 3%; border:0; border-radius:inherit; background:linear-gradient(180deg,rgba(255,194,244,.32),rgba(111,194,255,.14) 22%,transparent 58%); filter:blur(8px); }
+.stage-ribbons i:nth-child(1){left:-68%;top:-7%;transform:rotate(-24deg);animation-delay:-3s}
+.stage-ribbons i:nth-child(2){right:-73%;top:13%;width:126%;height:28%;transform:rotate(24deg);animation-delay:-9s}
+.stage-ribbons i:nth-child(3){left:-61%;bottom:7%;width:124%;height:25%;transform:rotate(18deg);animation-delay:-6s}
+.stage-ribbons i:nth-child(4){right:-63%;bottom:-4%;width:128%;height:27%;transform:rotate(-21deg);animation-delay:-11s}
+.stage-ribbons b { width:88%; height:30%; filter:blur(23px); opacity:.84; background:radial-gradient(ellipse at 45% 28%,rgba(180,146,255,.35),rgba(83,93,220,.18) 43%,transparent 72%); }
+.stage-ribbons b:nth-of-type(1){top:16%;left:-42%}.stage-ribbons b:nth-of-type(2){top:42%;right:-44%;background:radial-gradient(ellipse,rgba(96,173,255,.24),rgba(94,56,193,.16) 46%,transparent 72%)}.stage-ribbons b:nth-of-type(3){bottom:-7%;left:13%;background:radial-gradient(ellipse,rgba(250,132,207,.20),rgba(83,73,202,.15) 48%,transparent 72%)}
+@keyframes ribbon-drift{from{translate:0 0}to{translate:0 13px}}
+
+/* One coherent jelly CTA instead of a detached capsule. */
+#stageUi .btn-open-invite { min-width:224px; height:62px; padding:0 34px; border-radius:45% 55% 48% 52% / 52% 48% 55% 45%; color:#5e2853; font-size:16px; font-weight:800; letter-spacing:.015em; background:radial-gradient(ellipse at 28% 20%,rgba(255,255,255,.96),rgba(255,255,255,.25) 29%,transparent 43%),linear-gradient(165deg,#fff5ed 0%,#f9c4df 45%,#e894c7 100%); border:1px solid rgba(255,242,254,.9); box-shadow:0 13px 30px rgba(242,123,194,.29),0 7px 0 rgba(127,61,112,.36),inset 0 3px 8px rgba(255,255,255,.75),inset 0 -6px 12px rgba(202,89,161,.18); transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease; }
+#stageUi .btn-open-invite::after { display:block; top:6px; left:18%; right:20%; height:25%; border-radius:50%; background:rgba(255,255,255,.48); filter:blur(3px); }
+#stageUi .btn-open-invite:hover { transform:translateY(-2px) scale(1.025); }
+#stageUi .btn-open-invite:active { transform:translateY(4px) scale(.97); box-shadow:0 5px 15px rgba(242,123,194,.25),0 2px 0 rgba(127,61,112,.36),inset 0 2px 6px rgba(255,255,255,.65); }
+
+#stageUi .cta-container,
+#stageUi .shortcut-container {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+#stageUi .btn-open-invite {
+  width: auto;
+  min-width: 176px;
+  max-width: 260px;
+  height: 52px;
+  padding: 0 25px;
+  color: #602748;
+  background: linear-gradient(180deg,
+      #fff3e8 0%,
+      #f9d3e2 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 999px;
+  box-shadow:
+    0 10px 25px rgba(10, 2, 25, 0.27),
+    inset 0 2px 5px rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+#stageUi .btn-open-invite::after {
+  display: none;
+}
+
+#stageUi .btn-envelope-icon,
+#stageUi .sub-actions {
+  display: none;
+}
+
+#stageUi .shortcut-pill {
+  pointer-events: auto;
+}
+
+#stageUi .touch-hint {
+  pointer-events: none;
+}
+
+#stageUi .stage-actions {
+  position: absolute;
+  top: auto;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  transform: none;
+}

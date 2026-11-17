@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Thiệp mời — TÌNH TÍNH TING TING</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="authGate" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#180c29;color:#fff;padding:24px;font-family:'Be Vietnam Pro',sans-serif">
+      <form id="loginForm" style="width:min(440px,100%);display:grid;gap:14px;background:#2c1b42;padding:28px;border-radius:18px">
+        <h1 style="margin:0;font-size:24px">Đăng nhập Admin TTTT</h1>
+        <label>Email <input id="loginEmail" type="email" autocomplete="username" required style="width:100%;padding:12px;box-sizing:border-box" /></label>
+        <label>Mật khẩu <input id="loginPassword" type="password" autocomplete="current-password" required style="width:100%;padding:12px;box-sizing:border-box" /></label>
+        <button type="submit" style="padding:14px;cursor:pointer">Đăng nhập</button>
+        <p id="loginError" role="alert" style="color:#ffd0d9;white-space:pre-wrap;margin:0"></p>
+      </form>
+    </div>
+    <template id="adminAppTemplate">
+    <div class="admin-wrapper" id="adminApp">
+      <!-- Admin Header -->
+      <header class="admin-header">
+        <div class="header-inner">
+          <div class="header-brand">
+            <img src="/assets/brand/logo-white.png" alt="Logo" class="admin-logo" />
+            <div>
+              <h1>Hệ thống Quản lý Thiệp mời</h1>
+              <p class="subtitle">TÌNH TÍNH TING TING — Supabase Manager (L09B)</p>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button type="button" class="btn btn-sm btn-secondary" id="btnLogout">Đăng xuất</button>
+            <a href="/" class="btn-link" target="_blank">Mở trang thiệp mời chính ↗</a>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <!-- Deployment Notice Callout -->
+        <div class="notice-card">
+          <div class="notice-icon">💡</div>
+          <div class="notice-body">
+            <h3>Cơ chế Lưu trữ & Triển khai Web Tĩnh (Static Hosting)</h3>
+            <p>
+              Dữ liệu được lưu trực tiếp trên Supabase. Thêm hoặc sửa khách là có hiệu lực ngay, không cần deploy lại. Mỗi link sử dụng mã thiệp ngẫu nhiên.
+            </p>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <!-- Column 1: Event Information -->
+          <section class="admin-card">
+            <div class="card-title-row">
+              <h2>1. Thông tin Sự kiện Chung</h2>
+              <span class="badge">Toàn bộ khách</span>
+            </div>
+            <form id="formEvent" class="admin-form">
+              <div class="form-group">
+                <label for="inputEventName">Tên sự kiện</label>
+                <input type="text" id="inputEventName" required />
+              </div>
+              <div class="form-group">
+                <label for="inputEventDesc">Mô tả ngắn</label>
+                <textarea id="inputEventDesc" rows="3"></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputDate">Ngày diễn ra</label>
+                  <input type="text" id="inputDate" placeholder="VD: 18.03.2026 (Thứ Tư)" />
+                  <span class="field-hint">Để trống nếu chưa xác nhận</span>
+                </div>
+                <div class="form-group">
+                  <label for="inputStartTime">Giờ bắt đầu</label>
+                  <input type="text" id="inputStartTime" placeholder="VD: 10:00" />
+                </div>
+                <div class="form-group">
+                  <label for="inputEndTime">Giờ kết thúc</label>
+                  <input type="text" id="inputEndTime" placeholder="VD: 21:00" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group" style="flex: 1.5;">
+                  <label for="inputVenue">Địa điểm (Venue)</label>
+                  <input type="text" id="inputVenue" placeholder="VD: The Ants Studio" />
+                </div>
+                <div class="form-group" style="flex: 2;">
+                  <label for="inputAddress">Địa chỉ chi tiết</label>
+                  <input type="text" id="inputAddress" placeholder="VD: Vincom StarLake, Hà Nội" />
+                </div>
+              </div>
+              <div class="form-divider">Liên kết Mạng Xã hội (Để trống nếu không có)</div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="inputFb">Facebook URL</label>
+                  <input type="url" id="inputFb" placeholder="https://facebook.com/..." />
+                </div>
+                <div class="form-group">
+                  <label for="inputIg">Instagram URL</label>
+                  <input type="url" id="inputIg" placeholder="https://instagram.com/..." />
+                </div>
+                <div class="form-group">
+                  <label for="inputWeb">Website URL</label>
+                  <input type="url" id="inputWeb" placeholder="https://..." />
+                </div>
+                <div class="form-group">
+                  <label for="inputTiktok">TikTok URL</label>
+                  <input type="url" id="inputTiktok" placeholder="https://tiktok.com/@..." />
+                </div>
+                <div class="form-group">
+                  <label for="inputMaps">Google Maps URL</label>
+                  <input type="url" id="inputMaps" placeholder="https://maps.google.com/..." />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Lưu thông tin sự kiện</button>
+            </form>
+          </section>
+
+          <!-- Column 2: Add Guest -->
+          <section class="admin-card">
+            <div class="card-title-row">
+              <h2>2. Thêm Khách mời Mới</h2>
+              <span class="badge badge-accent">Cá nhân hóa</span>
+            </div>
+            <form id="formAddGuest" class="admin-form">
+              <div class="form-group">
+                <label for="inputGuestName">Tên hiển thị (ASCII Latin không dấu)</label>
+                <input type="text" id="inputGuestName" placeholder="VD: Linh, Minh Anh, Phuong..." required />
+                <span class="field-hint" id="nameHint">⚠️ Chỉ dùng chữ cái tiếng Anh A-Z không dấu để chữ kẹo dẻo hiển thị hoàn hảo.</span>
+              </div>
+              <div class="form-group">
+                <label for="inputGuestId">Mã gợi nhớ (không dùng làm link)</label>
+                <input type="text" id="inputGuestId" placeholder="Tự động từ tên" readonly />
+              </div>
+              <div class="form-group">
+                <label for="inputGuestMsg">Lời nhắn riêng (Tiếng Việt có dấu)</label>
+                <input type="text" id="inputGuestMsg" placeholder="VD: Có một điều thú vị đang chờ bạn!" />
+              </div>
+              <div class="form-group">
+                <label for="selectTheme">Màu chủ đề chữ</label>
+                <select id="selectTheme">
+                  <option value="pink">Hồng kẹo ngọt (Pink)</option>
+                  <option value="mint">Bạc hà mát lạnh (Mint)</option>
+                  <option value="yellow">Vàng rực rỡ (Yellow)</option>
+                  <option value="lilac">Tím lavender (Lilac)</option>
+                  <option value="gold">Vàng ánh kim (Gold)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-accent" style="margin-top: 10px;">+ Thêm vào danh sách</button>
+            </form>
+          </section>
+        </div>
+
+        <!-- Section 3: Guest Table & Links -->
+        <section class="admin-card" style="margin-top: 24px;">
+          <div class="card-title-row">
+            <h2>3. Danh sách Khách mời & Đường dẫn Thiệp</h2>
+            <div class="table-actions">
+              <button id="btnExportJson" class="btn btn-sm btn-secondary" type="button">⬇ Xuất JSON</button>
+              <button id="btnImportJson" class="btn btn-sm btn-secondary" type="button">⬆ Nhập JSON</button>
+              <button id="btnResetDefault" class="btn btn-sm btn-danger" type="button" disabled title="Không áp dụng cho dữ liệu production">Không reset tự động</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="guest-table">
+              <thead>
+                <tr>
+                  <th>Tên (Gummy)</th>
+                  <th>Token thiệp</th>
+                  <th>Lời nhắn riêng</th>
+                  <th>Chủ đề</th>
+                  <th>Link gửi khách</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="guestTableBody">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileImporter" accept=".json" style="display: none;" />
+    </template>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>
